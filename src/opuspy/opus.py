@@ -164,7 +164,7 @@ def start_opus(pam_path, user, sapshcut_path):
                 "element_id found, but text did not match 'Nyt password'."
             )
 
-def is_sap_scripting_allowed() -> bool:
+def is_sap_scripting_allowed():
     """
     TRUE if scripting is allowed, FALSE if not.
     """
@@ -198,7 +198,34 @@ def is_sap_scripting_allowed() -> bool:
     except Exception as e:
         print(f"An error occurred: {e}")
 
+def set_sap_scripting_to_allowed():
+    """
+    Set SAP scripting to allowed by changing the registry key.
+    """
+    try:
+        # Define the registry path
+        registry_path = (
+            r"SOFTWARE\WOW6432Node\SAP\SAPGUI Front\SAP Frontend Server\Security"
+        )
+        key_name = "UserScripting"
 
+        # Open the registry key with write access
+        reg_key = winreg.OpenKey(
+            winreg.HKEY_LOCAL_MACHINE, registry_path, 0, winreg.KEY_WRITE
+        )
+
+        # Set the value of the UserScripting key to 1 (allowed)
+        winreg.SetValueEx(reg_key, key_name, 0, winreg.REG_DWORD, 1)
+
+        # Close the registry key
+        winreg.CloseKey(reg_key)
+        print("SAP scripting has been set to allowed.")
+    except FileNotFoundError:
+        print("The specified registry key or value does not exist.")
+    except PermissionError:
+        print("Permission denied. Please run the script as an administrator.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 if __name__ == "__main__":
     if is_sap_scripting_allowed():
